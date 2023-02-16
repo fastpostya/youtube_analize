@@ -1,19 +1,19 @@
 import json
 import os
 from googleapiclient.discovery import build
-from config import youtube_api
+#from config import youtube_api
 
 
 class Channel():
-    api_key = youtube_api
+    #api_key = youtube_api
     # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
-    #api_key: str = os.getenv('YOUTUBE_API')
+    api_key: str = os.getenv('YOUTUBE_API')
 
     def __init__(self, id):
         self.id = id
         self.json = ""
         self.get_json_by_id()
-    
+
     def get_json_by_id(self):
         # создать специальный объект для работы с API
         with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
