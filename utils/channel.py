@@ -15,20 +15,20 @@ class Channel():
     api_key: str = os.getenv('YOUTUBE_API')
    
 
-    def __init__(self, id):
+    def __init__(self, id) -> None:
         """инициализация объекта Channel"""
         self.__id = id
         self.json = ""
         # загружаем информацию о канале по его id
         self.get_json_by_id()
-        self.title = self.json["items"][0]['snippet']['title']
-        self.chanel_description = self.json["items"][0]['snippet']['description']
-        self.url = r"https://www.youtube.com/channel/" + self.__id
-        self.video_count = self.json["items"][0]["statistics"]["videoCount"]
-        self.channel_number_of_views = self.json["items"][0]["statistics"]["viewCount"]
+        self.title = self.json["items"][0]['snippet']['title'] # название
+        self.description = self.json["items"][0]['snippet']['description'] # описание
+        self.url = r"https://www.youtube.com/channel/" + self.__id # url
+        self.video_count = self.json["items"][0]["statistics"]["videoCount"] # количество видео
+        self.number_of_views = self.json["items"][0]["statistics"]["viewCount"] # количество просмотров
 
 
-    def save_json_in_file(self, path):
+    def save_json_in_file(self, path) -> None:
         """метод сохраняет все атрибуты объекта channel, кроме json в файл по адресу path"""
         text = "["
         for dic in self.__dict__:
@@ -48,15 +48,20 @@ class Channel():
         channel = self.get_service().channels().list(id=self.__id, part='snippet,statistics').execute()
         self.json = channel
 
+    def __str__(self) -> str:
+        """метод возвращает текст для вывода на печать объекта channel
+        в виде Youtube-канал: <название_канала>"""
+        return "Youtube-канал: "+ self.title
 
-    def __repr__(self):
+
+    def __repr__(self) -> str:
         """метод возвращает представление объекта channel"""
         text = ""
         for dic in self.__dict__:
             text += dic + "=" + str(self.__dict__[dic]) + ", "
         return text[:-2]
 
-    def print_info(self):
+    def print_info(self) -> str:
         """метод ввыводит на печать содержимое json"""
         print(self.json)
 
@@ -66,3 +71,23 @@ class Channel():
         # youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=API_KEY)
         with build('youtube', 'v3', developerKey=cls.api_key) as youtube:
             return youtube
+
+    def __eq__(self, other) -> bool:
+        """метод сравнивает два канала по количеству подписчиков и 
+        возвращает True, если они равны"""
+        return self.number_of_views == other.number_of_views
+
+    def __lt__(self, other) -> bool:
+        """метод сравнивает два канала по количеству подписчиков и 
+        возвращает True, если у первого канала их меньше"""
+        return self.number_of_views < other.number_of_views      
+
+    def __gt__(self, other) -> bool:
+        """метод сравнивает два канала по количеству подписчиков и 
+        возвращает True, если у первого канала их больше"""
+        return self.number_of_views > other.number_of_views
+
+    def __add__(self, other) -> int:
+        """метод складывает число подписчиков у каналов"""
+        return self.number_of_views + other.number_of_views
+        
