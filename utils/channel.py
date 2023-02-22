@@ -8,8 +8,10 @@ class Channel():
     """Класс Channel для работы с каналами youtube. Для корректной работы
     необходимо поместить значение API key youtube в переменную среды YOUTUBE_API.
     Объект класса Channel инициализируется с помощью id канала. """
+    # 1-й способ загрузки API ключа из файла config.py
     #api_key = youtube_api
     
+    # 2-й способ загрузки API ключа из переменной окружения
     api_key: str = os.getenv('YOUTUBE_API')
    
 
@@ -34,14 +36,17 @@ class Channel():
                 text +=  "{'" + str(dic) + "':'" +str(self.__dict__[dic]) + "'}, \n"
         json_text = text[:-3] + "]"
         with open(path, "w", encoding="UTF-8") as file:
-            file.write(str(json_text))   
+            file.write(str(json_text))
 
     
     def get_json_by_id(self):
         """ метод создает специальный объект для работы с API youtube"""
-        with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
-            channel = youtube.channels().list(id=self.__id, part='snippet,statistics').execute()
-            self.json = channel
+        # 1-й способ
+        # with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
+        #     channel = youtube.channels().list(id=self.__id, part='snippet,statistics').execute()
+        # 2-й способ
+        channel = self.get_service().channels().list(id=self.__id, part='snippet,statistics').execute()
+        self.json = channel
 
 
     def __repr__(self):
@@ -55,10 +60,9 @@ class Channel():
         """метод ввыводит на печать содержимое json"""
         print(self.json)
 
-    def get_service(self):
-        """метод возвращает объект для работы с youtube"""
+    @classmethod
+    def get_service(cls):
+        """метод класса возвращает объект для работы с youtube"""
         # youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=API_KEY)
-        with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
-            #channel = youtube.channels().list(id=self.__id, part='snippet,statistics').execute()
+        with build('youtube', 'v3', developerKey=cls.api_key) as youtube:
             return youtube
-
