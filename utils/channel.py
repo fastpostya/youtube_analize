@@ -5,26 +5,64 @@ from googleapiclient.discovery import build
 
 
 class Channel():
+    """Класс Channel для работы с каналами youtube. Для корректной работы
+    необходимо поместить значение API key youtube в переменную среды YOUTUBE_API.
+    Объект класса Channel инициализируется с помощью id канала. """
+    # 1-й способ загрузки API ключа из файла config.py
     #api_key = youtube_api
-    # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
+    
+    # 2-й способ загрузки API ключа из переменной окружения
     api_key: str = os.getenv('YOUTUBE_API')
+   
 
     def __init__(self, id):
-        self.id = id
+        """инициализация объекта Channel"""
+        self.__id = id
         self.json = ""
+        # загружаем информацию о канале по его id
         self.get_json_by_id()
+        self.title = self.json["items"][0]['snippet']['title']
+        self.chanel_description = self.json["items"][0]['snippet']['description']
+        self.url = r"https://www.youtube.com/channel/" + self.__id
+        self.video_count = self.json["items"][0]["statistics"]["videoCount"]
+        self.channel_number_of_views = self.json["items"][0]["statistics"]["viewCount"]
 
+
+    def save_json_in_file(self, path):
+        """метод сохраняет все атрибуты объекта channel, кроме json в файл по адресу path"""
+        text = "["
+        for dic in self.__dict__:
+            if dic != 'json':
+                text +=  "{'" + str(dic) + "':'" +str(self.__dict__[dic]) + "'}, \n"
+        json_text = text[:-3] + "]"
+        with open(path, "w", encoding="UTF-8") as file:
+            file.write(str(json_text))
+
+    
     def get_json_by_id(self):
-        # создать специальный объект для работы с API
-        with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
-            channel = youtube.channels().list(id=self.id, part='snippet,statistics').execute()
-            self.json = json.dumps(channel, indent=2, ensure_ascii=False)
+        """ метод создает специальный объект для работы с API youtube"""
+        # 1-й способ
+        # with build('youtube', 'v3', developerKey=Channel.api_key) as youtube:
+        #     channel = youtube.channels().list(id=self.__id, part='snippet,statistics').execute()
+        # 2-й способ
+        channel = self.get_service().channels().list(id=self.__id, part='snippet,statistics').execute()
+        self.json = channel
+
 
     def __repr__(self):
+        """метод возвращает представление объекта channel"""
         text = ""
         for dic in self.__dict__:
             text += dic + "=" + str(self.__dict__[dic]) + ", "
         return text[:-2]
 
     def print_info(self):
+        """метод ввыводит на печать содержимое json"""
         print(self.json)
+
+    @classmethod
+    def get_service(cls):
+        """метод класса возвращает объект для работы с youtube"""
+        # youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=API_KEY)
+        with build('youtube', 'v3', developerKey=cls.api_key) as youtube:
+            return youtube
