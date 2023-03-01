@@ -48,7 +48,6 @@ class Channel():
         channel = self.get_service().channels().list(id=self.__id, part='snippet,statistics').execute()
         self.json = channel
 
-
     def __repr__(self):
         """метод возвращает представление объекта channel"""
         text = ""

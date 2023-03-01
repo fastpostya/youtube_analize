@@ -11,5 +11,5 @@ sales@redakciya.com
 
 '}, 
 {'url':'https://www.youtube.com/channel/UC1eFXmJNkjITxPFWTy6RsWg'}, 
-{'video_count':'587'}, 
-{'channel_number_of_views':'1029718670'}]
+{'video_count':'591'}, 
+{'channel_number_of_views':'1038858946'}]
