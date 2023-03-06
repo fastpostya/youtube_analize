@@ -1,19 +1,30 @@
-from config import api_key as key_for_youtube
 from googleapiclient.discovery import build
+from utils.youtube_class_abstract import Youtube_class
+from utils.config import api_key as key_for_youtube
 
 
-class Video():
+class Video(Youtube_class):
     """
-    Класс Video для работы с видео youtube.
+    Класс Video для работы с видео youtube. Унаследован от абстрактного класса Youtube_class.
+    Инициализируется по id видео.
+
+    Обязательные методы:
+
+    - get_service- метод класса для получения объекта build, через который 
+    осуществляется доступ к сервису youtube
+    - get_api_key - метод класса для получения значения API ключа, который 
+    задается в файле config.py
+
     Атрибуты:
-    - api_key - API ключ для доступа к сервису youtube.
-    - get_service() - метод класса для получения объекта build,
-     через который осуществляется доступ к сервису youtube
-     - set_api_key() -метод класса для получения значения API ключа из config.py
-     - __init__()- инициализация экземляра класса
-     - get_video_statistic() - метод получения статистики видео по его id
-     - __repr__() - метод возвращает представление объекта Video
-     - __str__() - метод возвращает строку для печати для объекта Video
+    - api_key - атрибут класса - API ключ для доступа к сервису youtube.
+    - video_id - id видео
+    - youtube - объект для работы с youtube
+
+    Методы:
+     - __init__- инициализация экземляра класса
+     - get_video_statistic - метод получения статистики видео по его id
+     - __repr__ - метод возвращает представление объекта Video
+     - __str__ - метод возвращает строку для печати для объекта Video
     """
     api_key = ""
 
@@ -29,7 +40,7 @@ class Video():
         cls.api_key = key_for_youtube
         return cls.api_key
 
-    def __init__(self, video_id):
+    def __init__(self, video_id: str) -> None:
         """инициализация класса.
         youtube - объект для работы с youtube"""
         self.set_api_key()
@@ -37,7 +48,7 @@ class Video():
         self.youtube = self.get_service()
         self.get_video_statistic()
 
-    def get_video_statistic(self):
+    def get_video_statistic(self) -> None:
         """
         Метод получения статистики видео по его id.
         Атрибуты:
@@ -53,14 +64,14 @@ class Video():
         self.video_likes: int = video_response['items'][0]['statistics']['likeCount']
         self.comment_count: int = video_response['items'][0]['statistics']['commentCount']
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """метод возвращает представление объекта Video"""
         text = ""
         for dic in self.__dict__:
             text += dic + "=" + str(self.__dict__[dic]) + ", "
         return text[:-2]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """метод возвращает строку для печати для объекта Video"""
         return self.video_title
 
@@ -70,18 +81,21 @@ class PLVideo(Video):
     Класс PLVideo для работы с видео и плейлистами youtube.
     Унаследован от Video.
     Атрибуты:
+    - self.playlist_id:str - id плейлиста
+    - playlist_name:str - название плейлиста
+    Методы:
     - __init__() - - инициализация экземляра класса
     - get_playlist_statistic() - метод получения статистики для видео из плейлиста
     - __repr__() - метод возвращает представление объекта Video
     - __str__() - метод возвращает строку для печати для объекта Video
     """
-    def __init__(self, video_id, playlist_id):
+    def __init__(self, video_id: str, playlist_id: str) -> None:
         "инициализация объекта класса PLVideo"
         Video.__init__(self, video_id)
         self.playlist_id = playlist_id
         self.get_playlist_statistic()
 
-    def get_playlist_statistic(self):
+    def get_playlist_statistic(self) -> None:
         """
         метод получения статистики для видео из плейлиста.
          Атрибуты:
@@ -90,22 +104,13 @@ class PLVideo(Video):
         playlist = self.youtube.playlists().list(id=self.playlist_id, part='snippet').execute()
         self.playlist_name = playlist['items'][0]['snippet']['title']
 
-        # playlist_videos = self.youtube.playlistItems().list(playlistId=\
-        #     self.playlist_id, part='contentDetails', maxResults=50,).execute()
-        
-        # получить все id видеороликов из плейлиста
-        # video_ids: list[str] = [video['contentDetails']['videoId'] for video in playlist_videos['items'] if video['contentDetails']['videoId'] == self.video_id]
-        
-       
-
-    def __repr__(self):
+    def __repr__(self) -> None:
         """метод возвращает представление объекта PLVideo"""
         text = ""
         for dic in self.__dict__:
             text += dic + "=" + str(self.__dict__[dic]) + ", "
         return text[:-2]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """метод возвращает строку для печати для объекта PLVideo"""
         return f"{self.video_title} ({self.playlist_name})"
-
