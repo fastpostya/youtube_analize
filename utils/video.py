@@ -22,7 +22,9 @@ class Video(Youtube_class):
 
     Методы:
      - __init__- инициализация экземляра класса
-     - get_video_statistic - метод получения статистики видео по его id
+     - get_video_statistic - метод получения статистики видео по его id. 
+     В случае некорректного id все атрибуты экземпляра класса Video, кроме id,
+      становятся None.
      - __repr__ - метод возвращает представление объекта Video
      - __str__ - метод возвращает строку для печати для объекта Video
     """
@@ -57,12 +59,19 @@ class Video(Youtube_class):
         - video_count - количество просмотров
         - video_likes - количество лайков
         """
-        video_response = self.youtube.videos().list(part='snippet,statistics', \
-            id=self.video_id).execute()
-        self.video_title: str = video_response['items'][0]['snippet']['title']
-        self.view_count: int = video_response['items'][0]['statistics']['viewCount']
-        self.video_likes: int = video_response['items'][0]['statistics']['likeCount']
-        self.comment_count: int = video_response['items'][0]['statistics']['commentCount']
+        try:
+            video_response = self.youtube.videos().list(part='snippet,statistics', \
+                id=self.video_id).execute()
+            self.video_title: str = video_response['items'][0]['snippet']['title']
+            self.view_count: int = video_response['items'][0]['statistics']['viewCount']
+            self.video_likes: int = video_response['items'][0]['statistics']['likeCount']
+            self.comment_count: int = video_response['items'][0]['statistics']['commentCount']
+        except:
+            # загрузка видео по id не удалась
+            self.video_name = None
+            self.video_count = None
+            self.video_likes = None
+            self.video_title = None
 
     def __repr__(self) -> str:
         """метод возвращает представление объекта Video"""
@@ -73,7 +82,7 @@ class Video(Youtube_class):
 
     def __str__(self) -> str:
         """метод возвращает строку для печати для объекта Video"""
-        return self.video_title
+        return str(self.video_title)
 
 
 class PLVideo(Video):

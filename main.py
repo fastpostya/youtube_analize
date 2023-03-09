@@ -51,10 +51,17 @@ def task5():
     print(pl.show_best_video())
 
 
+def task6():
+    """Задание 6"""
+    broken_video = Video('broken_video_id')
+    print(broken_video.video_title)
+    print(broken_video.video_count)
+
 def main():
     # task123()
     # task4()
-    task5()
+    # task5()
+    task6()
 
 
 if __name__ == "__main__":
