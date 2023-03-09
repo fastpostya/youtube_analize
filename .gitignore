@@ -1,0 +1,5 @@
+venv/
+# config.py
+API_YOUTUBE/
+__pycache__/
+utils/__pycache__/
